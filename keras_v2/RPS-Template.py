@@ -15,7 +15,7 @@ while True:
     cv2.imshow('frame', frame)
     # Press q to close the window
     print(prediction)
-    if cv2.waitKey(1) & 0xFF == ord('q'):
+    if cv2.waitKey(1) or 0xFF == ord('q'):
         break
             
 # After the loop release the cap object
