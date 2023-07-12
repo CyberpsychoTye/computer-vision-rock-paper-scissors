@@ -7,56 +7,28 @@ print("""
 \n*******************LOADING GAME********************\n
 """)
 model = load_model('keras_model.h5')
-# cap = cv2.VideoCapture(0)
-# data = np.ndarray(shape=(1, 224, 224, 3), dtype=np.float32)
+cap = cv2.VideoCapture(0)
 options = ["rock","paper","scissors"]
 players = ["Computer","Humanoid Player"]
+countdown_timer = 3
+user_choosing_duration = 30
 computer_score = 0
 player_score = 0
-count_three = """
-                                3333
-                                   3
-                                3333   
-                                   3
-                                3333
-"""
-count_two = """
-                                222222
-                                2    2
-                                    2
-                                   2
-                                 22  
-                                2222222 
-"""
 
-count_one = """
-                                   1
-                                 1 1
-                                1  1
-                                   1
-                                   1
-                                1111111   
-"""
 
-count_go = """
-                                GGGG    OO   ||
-                                G      O  O  ||
-                                G  GG  O  O  ||
-                                G   G  O  O  
-                                GGGGG   OO   !!
-"""
-
-def get_highest_probability() -> int: 
-    cap = cv2.VideoCapture(0)
-    data = np.ndarray(shape=(1, 224, 224, 3), dtype=np.float32)
-    ret, frame = cap.read()
-    resized_frame = cv2.resize(frame, (224, 224), interpolation = cv2.INTER_AREA)
-    image_np = np.array(resized_frame)
-    normalized_image = (image_np.astype(np.float32) / 127.0) - 1 # Normalize the image
-    data[0] = normalized_image
-    prediction = model.predict(data)
-    cv2.imshow('frame', frame)
-    cap.release()
+def get_highest_probability(duration:int) -> int: 
+    data_collection_period = duration
+    while data_collection_period != 0:    
+        data = np.ndarray(shape=(1, 224, 224, 3), dtype=np.float32)
+        ret, frame = cap.read()
+        resized_frame = cv2.resize(frame, (224, 224), interpolation = cv2.INTER_AREA)
+        image_np = np.array(resized_frame)
+        normalized_image = (image_np.astype(np.float32) / 127.0) - 1 # Normalize the image
+        data[0] = normalized_image
+        prediction = model.predict(data)
+        cv2.imshow('frame', frame)
+        cv2.waitKey(50)
+        data_collection_period -= 1
     cv2.destroyAllWindows()
     return (np.argmax(prediction[0]))
 
@@ -77,7 +49,7 @@ def get_computer_choice() -> str :
     return computer_choice
 
 def get_user_choice() -> str:
-    user_choice = get_prediction(get_highest_probability())
+    user_choice = get_prediction(get_highest_probability(user_choosing_duration))
     return user_choice
 
 def get_winner(computer_choice,user_choice):
@@ -116,18 +88,26 @@ def winner_validater(winner):
         global player_score
         player_score += 1
     
-def choosing_countdown():
-    time.sleep(4)
-    print("\nShow your choice to the camera at the end of this countdown!")
-    time.sleep(1)
-    print(count_three)
-    time.sleep(1)
-    print(count_two)
-    time.sleep(1)
-    print(count_one)
-    time.sleep(1)
-    print(count_go)
-    time.sleep(1)
+def countdown(time):
+    timer = time
+    while True:
+            if timer > 0:
+                ret, frame = cap.read()
+                font = cv2.FONT_HERSHEY_SIMPLEX
+                cv2.putText(frame, str(timer), (200, 250), font,7, (255, 255, 255),4, cv2.LINE_AA)
+                cv2.imshow("Shaka",frame)
+                cv2.waitKey(2000)
+                timer -= 1
+
+            else:
+                ret, frame = cap.read()
+                font = cv2.FONT_HERSHEY_SIMPLEX
+                cv2.putText(frame, str("GO!!"), (200, 250), font,7, (255, 255, 255),4, cv2.LINE_AA)
+                cv2.imshow("Shaka",frame)
+                cv2.waitKey(2000)
+                cv2.destroyAllWindows()
+                break
+
 
 def display_scoreboard():
     print(f"""\n
@@ -139,7 +119,7 @@ def display_scoreboard():
 def play_one_round():
     computer_choice = get_computer_choice()
     print(f"\nChoose one from the following:{options}")
-    choosing_countdown()
+    countdown(countdown_timer)
     user_choice = get_user_choice()
     print(f"Player picked: {user_choice}\nComputer picked: {computer_choice}")
     winner = get_winner(computer_choice, user_choice)
@@ -147,12 +127,7 @@ def play_one_round():
     winner_validater(winner)
     time.sleep(2)
     display_scoreboard()
-    # time.sleep(1)
-    # print("Next round commencing soon. Prepare yourself.....")
-    time.sleep(3)
     
-
-
 def play_game():
     while True:
         if computer_score == 3 or player_score == 3:
@@ -167,6 +142,7 @@ def play_game():
             
 
 play_game()
+
 
 
 
