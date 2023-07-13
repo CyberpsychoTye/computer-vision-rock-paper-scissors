@@ -11,11 +11,12 @@ class CVRockPaperScissors:
     player_score = 0
     options = ["rock","paper","scissors"]
     user_choosing_duration = 30
+    countdown_duration = 8
+    countdown_from = 3
 
-    def __init__(self,player_name = "Humanoid Player",countdown_timer = 3):
+    def __init__(self,player_name = "Humanoid Player"):
         self.player_name = player_name
         self.players = ["Computer",self.player_name]
-        self.countdown_timer = countdown_timer
         self.user_choice = ''
         self.computer_choice = ''
 
@@ -95,32 +96,65 @@ class CVRockPaperScissors:
             CVRockPaperScissors.player_score += 1
         
     
-    def countdown(self):
-        timer = self.countdown_timer
-        while True:
-            if timer > 0:
-                ret, frame = CVRockPaperScissors.cap.read()
-                font = cv2.FONT_HERSHEY_SIMPLEX
-                cv2.putText(frame, str(timer), (250, 250), font,7, (255, 255, 255),4, cv2.LINE_AA)
-                cv2.imshow("Shaka",frame)
-                cv2.waitKey(2000)
-                timer -= 1
+    # def number_display(self):
+    #     timer = self.countdown_duration
+    #     while True:
+    #         if timer > 0:
+    #             ret, frame = CVRockPaperScissors.cap.read()
+    #             font = cv2.FONT_HERSHEY_SIMPLEX
+    #             cv2.putText(frame, str(timer), (250, 250), font,7, (255, 255, 255),4, cv2.LINE_AA)
+    #             cv2.imshow("Shaka",frame)
+    #             cv2.waitKey(2000)
+    #             timer -= 1
 
-            else:
+    #         else:
+    #             ret, frame = CVRockPaperScissors.cap.read()
+    #             font = cv2.FONT_HERSHEY_SIMPLEX
+    #             cv2.putText(frame, str("GO!!"), (150, 250), font,7, (255, 255, 255),4, cv2.LINE_AA)
+    #             cv2.imshow("Shaka",frame)
+    #             cv2.waitKey(2000)
+    #             cv2.destroyAllWindows()
+    #             break
+
+    def countdown_wrapper(self,func):
+        def wrapper (character:int):
+            target = (time.time()) + CVRockPaperScissors.countdown_duration
+            while True:
+                current = time.time()
+                if target - current >= 6:
+                    func(character)
+                elif target - current >= 4:
+                    func(character - 1)
+                elif target - current >= 2:
+                    func(character - 2)
+                elif target - current > 0:
+                    func('GO!!',x_alignment = 150)
+                else:
+                    cv2.destroyAllWindows()
+                    break
+        return wrapper
+
+   
+    def character_display(self,character, x_alignment:int= 250):
+        target = time.time() + (CVRockPaperScissors.countdown_duration/4)
+        while True:
+            current = time.time()
+            if current >= target:
+                break
+            else:    
                 ret, frame = CVRockPaperScissors.cap.read()
                 font = cv2.FONT_HERSHEY_SIMPLEX
-                cv2.putText(frame, str("GO!!"), (150, 250), font,7, (255, 255, 255),4, cv2.LINE_AA)
+                cv2.putText(frame, str(character), (x_alignment, 250), font,7, (255, 255, 255),4, cv2.LINE_AA)
                 cv2.imshow("Shaka",frame)
-                cv2.waitKey(2000)
-                cv2.destroyAllWindows()
-                break
+                cv2.waitKey(50)
+            
 
     def display_scoreboard(self):
         print(f"""\n
                             Player: {CVRockPaperScissors.player_score}    Computer: {CVRockPaperScissors.computer_score}""")
         
     def play_one_round(self):
-        self.countdown()
+        self.countdown_wrapper(self.character_display)(self.countdown_from)
         self.winner_validater()
         print(f"Player picked: {self.user_choice}\nComputer picked: {self.computer_choice}")
         time.sleep(2)
@@ -137,14 +171,17 @@ class CVRockPaperScissors:
                     break
             else:
                 self.play_one_round()
+
+hello = CVRockPaperScissors()
+hello.play_one_round()
+
+
+
             
 
 
 
 
-hello = CVRockPaperScissors()
-
-hello.play_game()
 
 
     
