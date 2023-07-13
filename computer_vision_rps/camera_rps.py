@@ -38,6 +38,7 @@ class CVRockPaperScissors:
             cv2.putText(frame,"Press 'c' to continue.....",(30,345),font,0.6,(255,250,250),1,cv2.LINE_8)
             cv2.imshow('Landing Screen',frame)
             if cv2.waitKey(1) & 0xFF == ord('c'):
+                cv2.destroyAllWindows()
                 break
             
 
@@ -168,8 +169,25 @@ class CVRockPaperScissors:
             
 
     def display_scoreboard(self):
-        print(f"""\n
-                            Player: {CVRockPaperScissors.player_score}    Computer: {CVRockPaperScissors.computer_score}""")
+        font = cv2.FONT_HERSHEY_COMPLEX
+        while True:
+            ret, frame = CVRockPaperScissors.cap.read()
+            cv2.rectangle(frame,(26,87),(616,360),(0,0,0),-1)
+            cv2.putText(frame,"Scoreboard",(130,150),font,2,(250,250,250),1,cv2.LINE_4)
+            cv2.putText(frame,f"Computer: {CVRockPaperScissors.computer_score}",(97,220),font,0.7,(0,0,255),1,cv2.LINE_4)
+            cv2.putText(frame,f"{self.player_name}: {CVRockPaperScissors.player_score}",(313,220),font,0.7,(255,102,51),1,cv2.LINE_4)
+            cv2.putText(frame,f"Computer picked: {self.computer_choice}",(45,307),font,0.5,(255,250,250),1,cv2.LINE_8)
+            cv2.putText(frame,f"{self.player_name} picked: {self.user_choice}",(45,335),font,0.5,(255,250,250),1,cv2.LINE_8)
+            cv2.putText(frame,"press 'c' to continue.....",(405,335),font,0.5,(255,250,250),1,cv2.LINE_8)
+            cv2.imshow("Scoreboard",frame)
+            if cv2.waitKey(1) & 0xFF == ord('c'):
+                cv2.destroyAllWindows()
+                break
+
+            
+            
+
+
         
     def play_one_round(self):
         self.countdown_wrapper(self.character_display)(self.countdown_from)
