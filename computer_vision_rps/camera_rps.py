@@ -24,6 +24,23 @@ class CVRockPaperScissors:
         print("""
                     \n********************LOADING GAME********************\n""")
         
+    def landing_screen(self):
+        while True:
+            ret, frame = CVRockPaperScissors.cap.read()
+            font = cv2.FONT_HERSHEY_COMPLEX
+            cv2.rectangle(frame,(26,87),(616,360),(0,0,0),-1)
+            cv2.putText(frame,f"Welcome {self.player_name}",(85,120),font,1,(250,250,250),1,cv2.LINE_4)
+            cv2.putText(frame,"To Play:",(30,210),font,0.7,(255,102,51),1,cv2.LINE_8)
+            cv2.putText(frame,"1) Choose either Rock, Paper, or Scissors.",(32,250),font,0.6,(255,250,250),1,cv2.LINE_8)
+            cv2.putText(frame,"2) Show the camera your choice after the countdown.",(32,275),font,0.6,(255,250,250),1,cv2.LINE_8)
+            cv2.putText(frame,"3) Good luck :)",(32,300),font,0.6,(255,250,250),1,cv2.LINE_8)
+            cv2.putText(frame,"3) Good luck :)",(32,300),font,0.6,(255,250,250),1,cv2.LINE_8)
+            cv2.putText(frame,"Press 'c' to continue.....",(30,345),font,0.6,(255,250,250),1,cv2.LINE_8)
+            cv2.imshow('Landing Screen',frame)
+            if cv2.waitKey(1) & 0xFF == ord('c'):
+                break
+            
+
     def get_highest_probability(self) -> int:
         data_collection_period = CVRockPaperScissors.user_choosing_duration
         while data_collection_period != 0:    
@@ -135,8 +152,8 @@ class CVRockPaperScissors:
         return wrapper
 
    
-    def character_display(self,character, x_alignment:int= 250,shape_starting = (251,94),shape_ending = (390,264)):
-        target = time.time() + (CVRockPaperScissors.countdown_duration/4)
+    def character_display(self,character, x_alignment:int= 250, shape_starting = (251,94),shape_ending = (390,264), duration = 2):
+        target = time.time() + duration
         while True:
             current = time.time()
             if current >= target:
@@ -145,7 +162,7 @@ class CVRockPaperScissors:
                 ret, frame = CVRockPaperScissors.cap.read()
                 font = cv2.FONT_HERSHEY_SIMPLEX
                 cv2.rectangle(frame,shape_starting,shape_ending,(0,0,0),-1)
-                cv2.putText(frame, str(character), (x_alignment, 250), font,7, (255, 255, 255),4, cv2.LINE_AA)
+                cv2.putText(frame, str(character), (x_alignment, 250), font, 7, (255, 255, 255),4, cv2.LINE_AA)
                 cv2.imshow("Shaka",frame)
                 cv2.waitKey(50)
             
@@ -162,6 +179,7 @@ class CVRockPaperScissors:
         self.display_scoreboard()
 
     def play_game(self):
+        self.landing_screen()
         while True:
             if CVRockPaperScissors.computer_score == 3 or CVRockPaperScissors.player_score == 3:
                 if CVRockPaperScissors.computer_score == 3: 
@@ -174,7 +192,8 @@ class CVRockPaperScissors:
                 self.play_one_round()
 
 hello = CVRockPaperScissors()
-hello.play_one_round()
+hello.play_game()
+
 
 
 
