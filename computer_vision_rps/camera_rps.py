@@ -128,14 +128,14 @@ class CVRockPaperScissors:
                 elif target - current >= 2:
                     func(character - 2)
                 elif target - current > 0:
-                    func('GO!!',x_alignment = 150)
+                    func('GO!!',x_alignment = 100, shape_starting = (104,94),shape_ending = (522,264))
                 else:
                     cv2.destroyAllWindows()
                     break
         return wrapper
 
    
-    def character_display(self,character, x_alignment:int= 250):
+    def character_display(self,character, x_alignment:int= 250,shape_starting = (251,94),shape_ending = (390,264)):
         target = time.time() + (CVRockPaperScissors.countdown_duration/4)
         while True:
             current = time.time()
@@ -144,6 +144,7 @@ class CVRockPaperScissors:
             else:    
                 ret, frame = CVRockPaperScissors.cap.read()
                 font = cv2.FONT_HERSHEY_SIMPLEX
+                cv2.rectangle(frame,shape_starting,shape_ending,(0,0,0),-1)
                 cv2.putText(frame, str(character), (x_alignment, 250), font,7, (255, 255, 255),4, cv2.LINE_AA)
                 cv2.imshow("Shaka",frame)
                 cv2.waitKey(50)
@@ -174,6 +175,8 @@ class CVRockPaperScissors:
 
 hello = CVRockPaperScissors()
 hello.play_one_round()
+
+
 
 
 
